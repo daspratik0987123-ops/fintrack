@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#17243b">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Expense Tracker | Finance Manager</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="mint">
+
+<!-- Background layer (changes with the theme / profile photo) -->
+<div id="bgLayer"></div>
+
+<!-- Login / Register screen -->
+<div class="login-page" id="loginPage">
+    <div class="login-box">
+        <h2>₹ FinTrack</h2>
+        <p class="login-text" id="loginTitle">Login to your account</p>
+
+        <form id="loginForm">
+            <label>Username</label>
+            <input type="text" id="username" placeholder="Enter username" autocapitalize="none" required>
+
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Enter password" required>
+
+            <p class="error-text" id="loginError"></p>
+
+            <button type="submit" id="loginBtn">Login</button>
+        </form>
+
+        <p class="switch-text">
+            <span id="switchText">New here?</span>
+            <a href="#" id="switchLink">Create an account</a>
+        </p>
+    </div>
+</div>
+
+<!-- Main app (hidden until user logs in) -->
+<div class="app hidden" id="app">
+
+    <aside class="sidebar">
+        <h2>₹ FinTrack</h2>
+        <p class="side-label">MENU</p>
+
+        <a href="#dashboard" class="nav active" data-view="main">
+            <span class="ico">▦</span><span class="lbl">Dashboard</span>
+        </a>
+        <a href="#transactions" class="nav" data-view="main" data-target="transactions">
+            <span class="ico">⇄</span><span class="lbl">Transactions</span>
+        </a>
+        <a href="#reports" class="nav" data-view="main" data-target="comparison">
+            <span class="ico">▥</span><span class="lbl">Reports</span>
+        </a>
+        <a href="#udhaar" class="nav" data-view="udhaar">
+            <span class="ico">🤝</span><span class="lbl">Udhaar</span>
+            <span class="badge hidden" id="udhaarBadge">0</span>
+        </a>
+        <a href="#calculator" class="nav" data-view="calc">
+            <span class="ico">🧮</span><span class="lbl">Calculator</span>
+        </a>
+        <a href="#settings" class="nav" data-view="settings">
+            <span class="ico">⚙️</span><span class="lbl">Settings</span>
+        </a>
+
+        <div class="sidebar-bottom">
+            <div class="user-row">
+                <div class="avatar small avatar-open" role="button" tabindex="0" title="My profile"></div>
+                <div>
+                    <p>Logged in as</p>
+                    <strong id="userName"></strong>
+                </div>
+            </div>
+            <button type="button" id="logoutBtn" class="logout-btn">Logout</button>
+            <small>Version 1.3</small>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div class="avatar avatar-open" id="heroAvatar" role="button" tabindex="0" title="My profile"></div>
+            <div class="topbar-text">
+                <h1 id="pageTitle">Dashboard</h1>
+                <p id="welcome">Welcome! Here's your financial overview.</p>
+            </div>
+            <div class="date" id="today"></div>
+        </header>
+
+        <!-- ================= DASHBOARD / TRANSACTIONS / REPORTS ================= -->
+        <div id="viewMain">
+
+            <div class="top-area">
+
+                <section class="summary">
+
+                    <div class="card balance">
+                        <p>Total Balance</p>
+                        <h2 id="balance">₹0.00</h2>
+                        <span>Available balance</span>
+                    </div>
+
+                    <div class="card income">
+                        <p>Total Income</p>
+                        <h2 id="income">₹0.00</h2>
+                        <span>Money received</span>
+                    </div>
+
+                    <div class="card expense">
+                        <p>Total Expenses</p>
+                        <h2 id="expense">₹0.00</h2>
+                        <span>Money spent</span>
+                    </div>
+
+                </section>
+
+                <div class="panel category-panel">
+                    <div class="panel-heading">
+                        <h2>Expenses by Category</h2>
+                    </div>
+
+                    <div class="category-chart">
+                        <div class="circle" id="categoryCircle">
+                            <div class="circle-hole">
+                                <small>Total</small>
+                                <span id="categoryTotal">₹0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="category-legend" id="categoryLegend"></div>
+                </div>
+
+            </div>
+
+            <section class="content-grid">
+
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h2 id="formHeading">Add Transaction</h2>
+                    </div>
+
+                    <form id="transactionForm">
+
+                        <label>Transaction Type</label>
+                        <select id="type" required>
+                            <option value="expense">Expense</option>
+                            <option value="income">Income</option>
+                        </select>
+
+                        <label>Description</label>
+                        <input type="text" id="description"
+                               placeholder="e.g. Shopping" required>
+
+                        <label>Amount</label>
+                        <input type="number" id="amount"
+                               placeholder="Enter amount" min="0.01"
+                               step="0.01" inputmode="decimal" required>
+
+                        <label>Category</label>
+                        <select id="category" required>
+                            <option value="Food">Food</option>
+                            <option value="Travel">Travel</option>
+                            <option value="Shopping">Shopping</option>
+                            <option value="Fashion">Fashion</option>
+                            <option value="Education">Education</option>
+                            <option value="Salary">Salary</option>
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Other">Other</option>
+                        </select>
+
+                        <label>Date</label>
+                        <input type="date" id="date" required>
+
+                        <button type="submit" id="submitBtn">
+                            + Add Transaction
+                        </button>
+
+                        <button type="button" id="cancelEdit"
+                                class="cancel-btn hidden">
+                            Cancel Edit
+                        </button>
+
+                    </form>
+                </div>
+
+                <div class="panel" id="transactions">
+                    <div class="panel-heading">
+                        <h2>Recent Transactions</h2>
+                        <input type="text" id="search"
+                               placeholder="Search transactions...">
+                    </div>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Category</th>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionList">
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p id="emptyMessage" class="empty">
+                        No transactions yet. Add your first transaction!
+                    </p>
+                </div>
+
+            </section>
+
+            <section class="panel report" id="comparison">
+                <h2>Monthly Comparison</h2>
+                <p class="compare-note" id="compareNote"></p>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th id="lastMonthName">Last Month</th>
+                                <th id="thisMonthName">This Month</th>
+                                <th>Change</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Income</td>
+                                <td id="lastIncome"></td>
+                                <td id="thisIncome"></td>
+                                <td id="changeIncome"></td>
+                            </tr>
+                            <tr>
+                                <td>Expenses</td>
+                                <td id="lastExpense"></td>
+                                <td id="thisExpense"></td>
+                                <td id="changeExpense"></td>
+                            </tr>
+                            <tr>
+                                <td>Balance</td>
+                                <td id="lastBalance"></td>
+                                <td id="thisBalance"></td>
+                                <td id="changeBalance"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <section class="panel report" id="reports">
+                <div class="panel-heading">
+                    <h2>Financial Overview</h2>
+                    <div class="chart-switch">
+                        <button type="button" id="barBtn" class="switch-btn active">Bar</button>
+                        <button type="button" id="circleBtn" class="switch-btn">Circle</button>
+                    </div>
+                </div>
+
+                <div class="chart-area" id="barChart">
+                    <div class="chart-item">
+                        <div class="bar income-bar" id="incomeBar"></div>
+                        <span>Income</span>
+                    </div>
+                    <div class="chart-item">
+                        <div class="bar expense-bar" id="expenseBar"></div>
+                        <span>Expenses</span>
+                    </div>
+                </div>
+                <div class="circle-area hidden" id="circleChart">
+                    <div class="circle" id="circle">
+                        <div class="circle-hole">
+                            <span id="circleBig">0%</span>
+                            <small>expenses</small>
+                        </div>
+                    </div>
+
+                    <div class="legend">
+                        <p><span class="dot income-bar"></span> Income <strong id="legendIncome"></strong></p>
+                        <p><span class="dot expense-bar"></span> Expenses <strong id="legendExpense"></strong></p>
+                    </div>
+                </div>
+
+                <p class="chart-caption">Income vs Expenses (all transactions)</p>
+            </section>
+
+        </div>
+
+        <!-- ================= UDHAAR (lend / borrow) ================= -->
+        <div id="viewUdhaar" class="hidden">
+
+            <section class="udhaar-summary">
+                <div class="card income">
+                    <p>To Receive</p>
+                    <h2 id="toReceive">₹0.00</h2>
+                    <span>Money others owe you</span>
+                </div>
+                <div class="card expense">
+                    <p>To Pay</p>
+                    <h2 id="toPay">₹0.00</h2>
+                    <span>Money you owe others</span>
+                </div>
+            </section>
+
+            <section class="content-grid">
+
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h2 id="udhaarFormTitle">Add Udhaar</h2>
+                    </div>
+
+                    <form id="udhaarForm">
+
+                        <label>Type</label>
+                        <select id="uType">
+                            <option value="lent">I gave money (Maine udhaar diya)</option>
+                            <option value="borrowed">I took money (Maine udhaar liya)</option>
+                        </select>
+
+                        <label id="uNameLabel">Who did you give it to?</label>
+                        <input type="text" id="uName" placeholder="Person's name" required>
+
+                        <label>Amount</label>
+                        <input type="number" id="uAmount" placeholder="Enter amount"
+                               min="0.01" step="0.01" inputmode="decimal" required>
+
+                        <label>Date given</label>
+                        <input type="date" id="uDate" required>
+
+                        <label id="uDueLabel">They will return it by</label>
+                        <input type="date" id="uDue" required>
+
+                        <label>Remind me</label>
+                        <select id="uRemind">
+                            <option value="0">On the due date</option>
+                            <option value="1">1 day before</option>
+                            <option value="3" selected>3 days before</option>
+                            <option value="7">1 week before</option>
+                        </select>
+
+                        <label>Note (optional)</label>
+                        <input type="text" id="uNote" placeholder="e.g. for bike repair">
+
+                        <button type="submit" id="uSubmit">+ Add Udhaar</button>
+
+                        <button type="button" id="uCancel" class="cancel-btn hidden">
+                            Cancel Edit
+                        </button>
+
+                    </form>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h2>Udhaar List</h2>
+                    </div>
+
+                    <div class="chart-switch filter-tabs" id="udhaarTabs">
+                        <button type="button" class="switch-btn active" data-filter="pending">Pending</button>
+                        <button type="button" class="switch-btn" data-filter="lent">I Gave</button>
+                        <button type="button" class="switch-btn" data-filter="borrowed">I Took</button>
+                        <button type="button" class="switch-btn" data-filter="settled">Settled</button>
+                    </div>
+
+                    <div id="udhaarList"></div>
+
+                    <p id="udhaarEmpty" class="empty"></p>
+                </div>
+
+            </section>
+
+        </div>
+
+        <!-- ================= CALCULATOR ================= -->
+        <div id="viewCalc" class="hidden">
+            <div class="panel calc-panel">
+                <div class="calc-screen">
+                    <div class="calc-expr" id="calcExpr"></div>
+                    <div class="calc-result" id="calcResult">0</div>
+                </div>
+
+                <div class="calc-keys" id="calcKeys">
+                    <button type="button" data-key="C" class="clear">C</button>
+                    <button type="button" data-key="⌫" class="fn">⌫</button>
+                    <button type="button" data-key="%" class="fn">%</button>
+                    <button type="button" data-key="÷" class="op">÷</button>
+
+                    <button type="button" data-key="7">7</button>
+                    <button type="button" data-key="8">8</button>
+                    <button type="button" data-key="9">9</button>
+                    <button type="button" data-key="×" class="op">×</button>
+
+                    <button type="button" data-key="4">4</button>
+                    <button type="button" data-key="5">5</button>
+                    <button type="button" data-key="6">6</button>
+                    <button type="button" data-key="−" class="op">−</button>
+
+                    <button type="button" data-key="1">1</button>
+                    <button type="button" data-key="2">2</button>
+                    <button type="button" data-key="3">3</button>
+                    <button type="button" data-key="+" class="op">+</button>
+
+                    <button type="button" data-key="0" class="zero">0</button>
+                    <button type="button" data-key=".">.</button>
+                    <button type="button" data-key="=" class="equals">=</button>
+                </div>
+
+                <button type="button" id="calcUse" class="use-btn">Use result in Add Transaction</button>
+            </div>
+        </div>
+
+        <!-- ================= SETTINGS ================= -->
+        <div id="viewSettings" class="hidden">
+            <div class="content-grid">
+                
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h2>Account & Appearance</h2>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <strong>Profile & Background Theme</strong>
+                            <small>Change your avatar or app theme</small>
+                        </div>
+                        <button type="button" class="action-btn" id="openProfileFromSettings">Edit Profile</button>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <strong>Currency Symbol</strong>
+                            <small>Choose display currency</small>
+                        </div>
+                        <select id="currencySelect" class="setting-select">
+                            <option value="INR">₹ (INR)</option>
+                            <option value="USD">$ (USD)</option>
+                            <option value="EUR">€ (EUR)</option>
+                            <option value="GBP">£ (GBP)</option>
+                        </select>
+                    </div>
+
+                    <form id="changePasswordForm">
+                        <label>Change Password</label>
+                        <input type="password" id="newPassword" placeholder="Enter new password (min 4 chars)" required>
+                        <button type="submit">Update Password</button>
+                    </form>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h2>Data & Danger Zone</h2>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <strong>Export Backup</strong>
+                            <small>Download all transactions & udhaar as JSON</small>
+                        </div>
+                        <button type="button" class="action-btn done-btn" id="exportDataBtn">Export</button>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <strong>Reset All Data</strong>
+                            <small>Permanently delete your records</small>
+                        </div>
+                        <button type="button" class="action-btn delete-btn" id="resetDataBtn">Reset</button>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <strong>Sign Out</strong>
+                            <small>Log out of your current session</small>
+                        </div>
+                        <button type="button" class="action-btn delete-btn" id="logoutBtn3">Logout</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <footer>
+            Expense Tracker © 2026 | Personal Finance Manager
+        </footer>
+
+    </main>
+
+    <!-- Profile / background picker -->
+    <div class="modal hidden" id="profileModal">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h2>My Profile</h2>
+                <button type="button" class="modal-close" id="profileClose" aria-label="Close">✕</button>
+            </div>
+
+            <div class="profile-top">
+                <div class="avatar big" id="bigAvatar"></div>
+                <strong id="profileName"></strong>
+            </div>
+
+            <div class="profile-btns">
+                <button type="button" id="photoUpload">Upload photo</button>
+                <button type="button" id="photoRemove" class="cancel-btn">Remove</button>
+            </div>
+            <input type="file" id="photoInput" accept="image/*" class="hidden">
+
+            <label class="modal-label">Background</label>
+            <div class="theme-row" id="themeRow">
+                <div class="swatch-wrap"><button type="button" class="theme-swatch" data-theme="mint" aria-label="Mint"></button><span>Mint</span></div>
+                <div class="swatch-wrap"><button type="button" class="theme-swatch" data-theme="sunset" aria-label="Sunset"></button><span>Sunset</span></div>
+                <div class="swatch-wrap"><button type="button" class="theme-swatch" data-theme="ocean" aria-label="Ocean"></button><span>Ocean</span></div>
+                <div class="swatch-wrap"><button type="button" class="theme-swatch" data-theme="aurora" aria-label="Aurora"></button><span>Aurora</span></div>
+                <div class="swatch-wrap"><button type="button" class="theme-swatch" data-theme="night" aria-label="Night"></button><span>Night</span></div>
+                <div class="swatch-wrap"><button type="button" class="theme-swatch" data-theme="photo" id="photoSwatch" aria-label="My photo"></button><span>My photo</span></div>
+            </div>
+
+            <button type="button" id="profileDone">Done</button>
+            <button type="button" id="logoutBtn2" class="logout-btn modal-logout">Logout</button>
+        </div>
+    </div>
+
+    <div class="toast hidden" id="toast"></div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
